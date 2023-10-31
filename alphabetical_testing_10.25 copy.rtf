@@ -1,0 +1,77 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2757
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww28900\viewh15860\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Sub TicketTracker()\
+\
+For Each ws In Worksheets\
+\
+LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row\
+ws.Cells(1, 9).Value = "Ticker"\
+ws.Cells(1, 10).Value = "Yearly Change"\
+ws.Cells(1, 11).Value = "Percent Change"\
+ws.Cells(1, 12).Value = "Total Stock Volume"\
+\
+'Loop through the Stock tickers in a given sheet\
+\
+Dim i As Integer\
+\
+For i = 2 To LastRow\
+\
+Dim ticker As String\
+Dim yearopen As Double\
+Dim yearclose As Double\
+Dim vol As Double\
+Dim ticker_table_row As Integer\
+\
+vol = 0\
+ticker_table_row = 2\
+\
+'Determine if Stock ticker has changed\
+\
+If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then\
+    ticker = ws.Cells(i, 1).Value\
+    yearclose = ws.Cells(i, 6).Value\
+    yearopen = ws.Cells(i, 3).Value\
+    vol = vol + ws.Cells(i, 7).Value\
+    \
+    Dim yearlychange As Double\
+    Dim yearlypercentage As Double\
+\
+    'Calculate YOY change from open to close\
+    yearlychange = yearopen - yearclose\
+    \
+    'Calculate YOY percentage change from open to close\
+    yearlypercentage = (yearopen - yearclose) / yearopen\
+    \
+    ' Print the Stock Ticker in the Summary Table\
+    ws.Range("I" & ticker_table_row).Value = ticker\
+    \
+    ' Print the Yearly Change to the Summary Table\
+    ws.Range("J" & ticker_table_row).Value = yearlychange\
+    \
+    ' Print the Yearly Percentage Change to the Summary Table\
+    ws.Range("K" & ticker_table_row).Value = yearlypercentage\
+    \
+    ' Print the total stock volume to the Summary Table\
+    ws.Range("L" & ticker_table_row).Value = vol\
+\
+    ticker_table_row = ticker_table_row + 1\
+    vol = 0\
+    \
+    \
+Else\
+    vol = vol + ws.Cells(i, 7).Value\
+    \
+End If\
+\
+Next i\
+\
+Next ws\
+\
+\
+End Sub\
+}

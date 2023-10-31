@@ -1,0 +1,171 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2757
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Sub TicketTracker()\
+\
+For Each ws In Worksheets\
+\
+'Create "Ticker tracker" headers\
+ws.Cells(1, 9).Value = "Ticker"\
+ws.Cells(1, 10).Value = "Yearly Change"\
+ws.Cells(1, 11).Value = "Percent Change"\
+ws.Cells(1, 12).Value = "Total Stock Volume"\
+\
+'Create "Overview Table" headers\
+ws.Cells(2, 15).Value = "Greatest % Increase"\
+ws.Cells(3, 15).Value = "Greatest % Decrease"\
+ws.Cells(4, 15).Value = "Greatest Total Volume"\
+ws.Cells(1, 16).Value = "Ticker"\
+ws.Cells(1, 17).Value = "Value"\
+\
+  Dim ticker_Name As String\
+  Dim year_open As Double\
+  Dim year_close As Double\
+  Dim volume_total As Double\
+  volume_total = 0\
+  \
+  'Create Table_Row dimension for table creation\
+  Dim Ticker_Table_Row As Integer\
+  Ticker_Table_Row = 2\
+  \
+  'Create row counter to find Year Open for each stock\
+  Dim Row_counter As Integer\
+  Row_counter = 0\
+  \
+  lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row\
+\
+'First for loop to create "Ticker Tracker" Table\
+  For i = 2 To lastrow\
+\
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then\
+    \
+      ticker_Name = ws.Cells(i, 1).Value\
+      volume_total = volume_total + ws.Cells(i, 7).Value\
+      year_open = ws.Cells(i - Row_counter, 3).Value\
+      year_close = ws.Cells(i, 6).Value\
+      \
+      Dim yearly_change As Double\
+      Dim yearly_percentage As Double\
+      \
+      'Create functions for Yearly change and Percentage\
+      yearly_change = year_open - year_close\
+      yearly_percentage = (year_open - year_close) / year_open\
+      \
+      'Input Stock Ticker Data in "Ticker Tracker" Table\
+      ws.Range("I" & Ticker_Table_Row).Value = ticker_Name\
+      ws.Range("J" & Ticker_Table_Row).Value = yearly_change\
+      ws.Range("K" & Ticker_Table_Row).Value = yearly_percentage\
+      ws.Range("L" & Ticker_Table_Row).Value = volume_total\
+      \
+      ' Nested if statement to determine color formatting\
+      If yearly_change > 0 Then\
+        ws.Range("J" & Ticker_Table_Row).Interior.ColorIndex = 4\
+      ElseIf yearly_change < 0 Then\
+        ws.Range("J" & Ticker_Table_Row).Interior.ColorIndex = 3\
+     Else\
+        ws.Range("J" & Ticker_Table_Row).Interior.ColorIndex = 2\
+    \
+      End If\
+      \
+      'Resets Row Counter and Volume Tracker, and moves to Next Row\
+      Ticker_Table_Row = Ticker_Table_Row + 1\
+      volume_total = 0\
+      Row_counter = 0\
+      \
+    Else\
+    \
+    'Continue aggregating volume trade information and tracking rows for the given stock\
+      volume_total = volume_total + ws.Cells(i, 7).Value\
+      Row_counter = Row_counter + 1\
+      \
+    End If\
+\
+  Next i\
+  \
+  \
+  'New Lastrow to evaluate new "Ticker Tracker" Table for Overview Table\
+  lastrow2 = ws.Cells(Rows.Count, 9).End(xlUp).Row\
+  \
+  'Format "Ticker Tracker" table columns\
+  ws.Range("J:J").NumberFormat = "$#,##0.00"\
+  ws.Range("K:K").NumberFormat = "0.00%"\
+  ws.Range("L:L").NumberFormat = "#,##0"\
+  \
+  'For loops to determine Greatest Increase/Decrease and Greatest Volume\
+  \
+  'Define Greatest Increase value and Cell Row\
+  Dim Greatest_Increase As Double\
+  Greatest_Increase = 0\
+  Increase_CellRef = 0\
+  \
+   'Define Greatest Decrease value and Cell Row\
+  Dim Greatest_Decrease As Double\
+  Greatest_Decrease = 0\
+  CellRef_Decrease = 0\
+  \
+  'Define Greatest Volume value and Cell Row\
+  Dim Greatest_Volume As Double\
+  Greatest_Volume = 0\
+  CellRef_Volume = 0\
+  \
+  'For Loop for Greatest % Increase\
+  For J = 2 To lastrow2\
+    If ws.Cells(J, 11).Value > Greatest_Increase Then\
+        Greatest_Increase = ws.Cells(J, 11).Value\
+        CellRef_Increase = ws.Cells(J, 9).Value\
+    Else\
+        Greatest_Increase = Greatest_Increase\
+        CellRef_Increase = CellRef_Increase\
+    End If\
+\
+    Next J\
+    \
+  'For Loop for Greatest % Decrease\
+  For k = 2 To lastrow2\
+    If ws.Cells(k, 11).Value < Greatest_Decrease Then\
+        Greatest_Decrease = ws.Cells(k, 11).Value\
+        CellRef_Decrease = ws.Cells(k, 9).Value\
+    Else\
+        Greatest_Decrease = Greatest_Decrease\
+        CellRef_Decrease = CellRef_Decrease\
+    End If\
+\
+    Next k\
+    \
+  'For Loop for Greatest Volume\
+  For x = 2 To lastrow2\
+    If ws.Cells(x, 12).Value > Greatest_Volume Then\
+        Greatest_Volume = ws.Cells(x, 12).Value\
+        CellRef_Volume = ws.Cells(x, 9).Value\
+    Else\
+        Greatest_Volume = Greatest_Volume\
+        CellRef_Volume = CellRef_Volume\
+    End If\
+\
+    Next x\
+  \
+  'Format Overview table columns\
+  ws.Cells(2, 17).NumberFormat = "0.00%"\
+  ws.Cells(3, 17).NumberFormat = "0.00%"\
+  ws.Cells(4, 17).NumberFormat = "#,##0"\
+\
+ 'Input Overview table contents\
+  ws.Cells(2, 17).Value = Greatest_Increase\
+  ws.Cells(2, 16).Value = CellRef_Increase\
+  \
+  ws.Cells(3, 17).Value = Greatest_Decrease\
+  ws.Cells(3, 16).Value = CellRef_Decrease\
+  \
+  ws.Cells(4, 17).Value = Greatest_Volume\
+  ws.Cells(4, 16).Value = CellRef_Volume\
+  \
+Next ws\
+\
+End Sub\
+\
+\
+}
